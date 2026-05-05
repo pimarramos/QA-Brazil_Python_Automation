@@ -1,11 +1,23 @@
 import numbers
 import data
 import helpers
+import time
 
+from pages import UrbanRoutesPage
+from selenium.webdriver import Chrome
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 class TestUrbanRoutes:
     @classmethod
     def setup_class(cls):
+        from selenium.webdriver import DesiredCapabilities
+        capabilities = DesiredCapabilities.CHROME
+        capabilities["goog:loggingPrefs"] = {'performance': 'ALL'}
+        cls.driver = Chrome()
+        cls.driver.implicitly_wait(5)
+
         if helpers.is_url_reachable(data.URBAN_ROUTES_URL):
             print("Conectado ao servidor Urban Routes")
         else:
@@ -13,10 +25,16 @@ class TestUrbanRoutes:
                 "Não foi possível conectar ao Urban Routes. Verifique se o servidor está ligado e ainda em execução."
             )
 
+    def setup_method(self):
+        self.driver.get(data.URBAN_ROUTES_URL)
+        self.page = UrbanRoutesPage(self.driver)
+
     def test_set_route(self):
-        # adicionar em S8
-        print("Função criada para definir a rota")
-        pass
+       self.page.enter_locations(data.ADDRESS_FROM, data.ADDRESS_TO)
+       assert self.page._get_from_location() == data.ADDRESS_FROM
+       assert self.page._get_to_location() == data.ADDRESS_TO
+       time.sleep(10)
+
 
     def test_select_plan(self):
         # adicionar em S8
@@ -54,3 +72,7 @@ class TestUrbanRoutes:
         # adicionar em S8
         print("Função criada para verificar se o modelo de carro aparece na busca")
         pass
+
+    @classmethod
+    def teardown_class(cls):
+        cls.driver.quit()
