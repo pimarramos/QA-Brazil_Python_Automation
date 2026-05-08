@@ -1,5 +1,3 @@
-from html.parser import commentclose
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -11,11 +9,18 @@ class UrbanRoutesPage:
        from_field = (By.ID, 'from')
        to_field = (By.ID, 'to')
 
+       # Fluxo de chamada de taxi
+       taxi_option = (By.XPATH, '//button[contains(text(), "Chamar")]')
+       comfort_icon = (By.XPATH, '//img[@src="/static/media/kids.075fd8d4.svg"]')
+       comfort_active = (By.XPATH, '//*[@id="root"]/div/div[3]/div[3]/div[2]/div[1]/div[5]')
+
+
        def __init__(self, driver):
            self.driver = driver
            self.wait = WebDriverWait(driver, 10)
 
-       # Metódos COR POM
+
+       # Métodos COR POM
 
        def _find(self,locator):
            return self.wait.until(EC.visibility_of_element_located(locator))
@@ -45,6 +50,24 @@ class UrbanRoutesPage:
 
        def _get_to_location(self):
            return self._get_value(self.to_field)
+
+       # Chamar Taxi
+
+       def click_taxi_option(self):
+          self.driver.find_element(*self.taxi_option).click()
+
+       def click_icon_comfort_selected(self):
+           self.driver.find_element(*self.comfort_icon).click()
+
+       def is_comfort_icon_active(self):
+           try:
+               active_button = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located(self.comfort_active))
+
+               return "active" in active_button.get_attribute("class")
+           except:
+               return False
+
+       # Preencher telefone
 
 
 

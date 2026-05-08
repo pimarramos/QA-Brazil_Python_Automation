@@ -28,37 +28,40 @@ class TestUrbanRoutes:
     def setup_method(self):
         self.driver.get(data.URBAN_ROUTES_URL)
         self.page = UrbanRoutesPage(self.driver)
+        self.page.enter_locations(data.ADDRESS_FROM, data.ADDRESS_TO)
+        self.page.click_taxi_option()
+
 
     def test_set_route(self):
-       self.page.enter_locations(data.ADDRESS_FROM, data.ADDRESS_TO)
-       assert self.page._get_from_location() == data.ADDRESS_FROM
-       assert self.page._get_to_location() == data.ADDRESS_TO
-       time.sleep(10)
+        assert self.page._get_from_location() == data.ADDRESS_FROM
+        assert self.page._get_to_location() == data.ADDRESS_TO
+        time.sleep(10)
 
 
     def test_select_plan(self):
-        # adicionar em S8
-        print("Função criada para selecionar o plano")
-        pass
+        self.page.click_taxi_option()
+        self.page.click_icon_comfort_selected()
+        assert self.page.is_comfort_icon_active()
+        time.sleep(10)
 
     def test_fill_phone_number(self):
-        # adicionar em S8
-        print("Função criada para preencher o número de telefone")
+
+        print("função criada para definir o cartão para pagamento")
         pass
 
     def test_fill_card(self):
-        # adicionar em S8
-        print("Função criada para preencher os dados do cartão")
+
+        print ("função criada para definir o cartão para pagamento")
         pass
 
     def test_comment_for_driver(self):
-        # adicionar em S8
-        print("Função criada para adicionar comentário para o motorista")
-        pass
+
+       print ("função criada para bla")
+       pass
 
     def test_order_blanket_and_handkerchiefs(self):
-        # adicionar em S8
-        print("Função criada para solicitar cobertor e lenços")
+
+        print("função criada para bla bla")
         pass
 
     def test_order_2_ice_creams(self):
@@ -69,8 +72,8 @@ class TestUrbanRoutes:
         pass
 
     def test_car_search_model_appears(self):
-        # adicionar em S8
-        print("Função criada para verificar se o modelo de carro aparece na busca")
+
+        print("função criada para bla bla bla")
         pass
 
     @classmethod
