@@ -1,21 +1,19 @@
-import numbers
+import time
 import data
 import helpers
-import time
 
 from pages import UrbanRoutesPage
 from selenium.webdriver import Chrome
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver import ChromeOptions
+
 
 class TestUrbanRoutes:
     @classmethod
     def setup_class(cls):
-        from selenium.webdriver import DesiredCapabilities
-        capabilities = DesiredCapabilities.CHROME
-        capabilities["goog:loggingPrefs"] = {'performance': 'ALL'}
-        cls.driver = Chrome()
+        options = ChromeOptions()
+        options.set_capability("goog:loggingPrefs", {'performance': 'ALL'})
+
+        cls.driver = Chrome(options=options)
         cls.driver.implicitly_wait(5)
 
         if helpers.is_url_reachable(data.URBAN_ROUTES_URL):
@@ -31,50 +29,54 @@ class TestUrbanRoutes:
         self.page.enter_locations(data.ADDRESS_FROM, data.ADDRESS_TO)
         self.page.click_taxi_option()
 
-
     def test_set_route(self):
-        assert self.page._get_from_location() == data.ADDRESS_FROM
-        assert self.page._get_to_location() == data.ADDRESS_TO
-        time.sleep(10)
-
+        assert self.page.get_from_location() == data.ADDRESS_FROM
+        assert self.page.get_to_location() == data.ADDRESS_TO
 
     def test_select_plan(self):
-        self.page.click_taxi_option()
-        self.page.click_icon_comfort_selected()
-        assert self.page.is_comfort_icon_active()
-        time.sleep(10)
+        self.page.select_comfort_plan()
+        assert self.page.is_comfort_plan_selected()
 
     def test_fill_phone_number(self):
-
-        print("função criada para definir o cartão para pagamento")
-        pass
+        self.page.fill_phone_number(data.PHONE_NUMBER)
+        time.sleep(2)
+        phone_code = helpers.retrieve_phone_code(self.driver)
+        self.page.fill_phone_code(phone_code)
+        assert data.PHONE_NUMBER in self.page.get_phone_number()
 
     def test_fill_card(self):
-
-        print ("função criada para definir o cartão para pagamento")
-        pass
+        self.page.select_comfort_plan()
+        self.page.add_credit_card(data.CARD_NUMBER, data.CARD_CODE)
 
     def test_comment_for_driver(self):
-
-       print ("função criada para bla")
-       pass
+        self.page.write_comment_for_driver(data.MESSAGE_FOR_DRIVER)
+        assert self.page.get_comment_for_driver() == data.MESSAGE_FOR_DRIVER
 
     def test_order_blanket_and_handkerchiefs(self):
-
-        print("função criada para bla bla")
-        pass
+        self.page.select_comfort_plan()
+        self.page.order_blanket_and_handkerchiefs()
+        assert self.page.is_blanket_and_handkerchiefs_selected()
 
     def test_order_2_ice_creams(self):
-        numbers_of_ice_creams = 2
-        for count in range(numbers_of_ice_creams):
-            # adicionar em S8
-            print(f"Função criada para adicionar o {count + 1}º sorvete ao pedido")
-        pass
+        self.page.select_comfort_plan()
+        self.page.order_ice_creams(2)
+        assert self.page.get_ice_cream_count() == 2
 
     def test_car_search_model_appears(self):
+        self.page.select_comfort_plan()
 
-        print("função criada para bla bla bla")
-        pass
+        self.page.fill_phone_number(data.PHONE_NUMBER)
+        time.sleep(2)
+        phone_code = helpers.retrieve_phone_code(self.driver)
+        self.page.fill_phone_code(phone_code)
+
+        self.page.add_credit_card(data.CARD_NUMBER, data.CARD_CODE)
+        self.page.write_comment_for_driver(data.MESSAGE_FOR_DRIVER)
+        self.page.order_blanket_and_handkerchiefs()
+        self.page.order_ice_creams(2)
+
+        self.page.order_taxi()
+        assert self.page.is_car_search_modal_visible()
 
     @classmethod
     def teardown_class(cls):
